@@ -35,19 +35,31 @@ public class StreamWordCount {
 
         // 从 socket 文本流读取数据
         // 用 parameter tool 工具从程序启动参数中提取配置项
-        // 注: socketTextStream() 的并行度一定为 1, 因为不能多线程读取文件流
+        // 并行度: socketTextStream() 的并行度一定为 1, 因为不能多线程读取文件流
+        // slot 共享组: 当前 Source 为第一个操作, 共享组为 default
         ParameterTool parameterTool = ParameterTool.fromArgs(args);
         String hostname = parameterTool.get("hostname");
         int port = parameterTool.getInt("port");
         DataStreamSource<String> dataStream = streamEnv.socketTextStream(hostname, port);
 
         // 对 DataStream 数据流进行处理, 按空格分词展开, 并转换成 (word, 1) 的二元组形式
-        SingleOutputStreamOperator<Tuple2<String, Integer>> dataStream2 = dataStream.flatMap(new MyFlatMapFunction());
+        SingleOutputStreamOperator<Tuple2<String, Integer>> dataStream2 = dataStream.flatMap(new MyFlatMapFunction())
+                // slot 共享组: 相同的组可以共享同一个 slot, 不同的组不能共享同一个 slot
+                // 默认和前一个操作的共享组相同, 第一个操作的共享组默认为 default
+                .slotSharingGroup("A");
 
+        // 通过第 1 个位置的 word 分组
         KeyedStream<Tuple2<String, Integer>, Tuple> dataStream3 = dataStream2.keyBy(0);
 
+        // 对第 2 个位置上的数据求和
         SingleOutputStreamOperator<Tuple2<String, Integer>> dataStream4 = dataStream3.sum(1)
-                .setParallelism(2);
+                // 当前算子单独设置并行度, 优先级最高
+                .setParallelism(2)
+                // slot 共享组: 相同的组可以共享同一个 slot, 不同的组不能共享同一个 slot
+                // 默认和前一个操作的共享组相同, 第一个操作的共享组默认为 default
+                .slotSharingGroup("B");
+
+        // slot 共享组: 默认和前一个操作的共享组相同, 共享组为 B
         dataStream4.print();
 
         // 执行任务

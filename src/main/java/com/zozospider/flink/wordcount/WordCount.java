@@ -27,6 +27,7 @@ public class WordCount {
 
         // 对第 2 个位置上的数据求和
         AggregateOperator<Tuple2<String, Integer>> dataSet3 = grouping.sum(1);
+
         dataSet3.print();
     }
 
