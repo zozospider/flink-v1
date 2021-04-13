@@ -14,7 +14,7 @@ public class Source01Collection {
         // 如果设置并行度为 1, 则最终会顺序打印元素
         // streamEnv.setParallelism(1);
 
-        // 从集合中读取数据
+        // 从集合读取数据
         DataStreamSource<Integer> dataStreamA = streamEnv.fromElements(1, 2, 3, 4);
         DataStreamSource<SensorReading> dataStreamB = streamEnv.fromElements(
                 new SensorReading("sensor_1", 1547718199L, 35.8),

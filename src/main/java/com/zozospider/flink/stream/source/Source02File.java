@@ -11,7 +11,7 @@ public class Source02File {
         // 如果设置并行度为 1, 则最终会顺序打印元素 (每个文件内部顺序打印)
         // streamEnv.setParallelism(1);
 
-        // 从文件中读取数据
+        // 从文件读取数据
         DataStreamSource<String> dataStream = streamEnv.readTextFile("data-dir/word-count");
 
         dataStream.print();
