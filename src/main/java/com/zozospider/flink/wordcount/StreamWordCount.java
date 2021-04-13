@@ -1,7 +1,6 @@
 package com.zozospider.flink.wordcount;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
-import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -10,7 +9,7 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
 
-// 流处理 WordCount
+// 流处理 WordCount - 提交到生产环境版本
 public class StreamWordCount {
 
     public static void main(String[] args) throws Exception {
@@ -58,7 +57,8 @@ public class StreamWordCount {
                 .slotSharingGroup("A");
 
         // 通过第 1 个位置的 word 分组
-        KeyedStream<Tuple2<String, Integer>, Tuple> dataStream3 = dataStream2.keyBy(0);
+        // KeyedStream<Tuple2<String, Integer>, Tuple> dataStream3 = dataStream2.keyBy(0);
+        KeyedStream<Tuple2<String, Integer>, String> dataStream3 = dataStream2.keyBy(tuple2 -> tuple2.f0);
 
         // 对第 2 个位置上的数据求和
         SingleOutputStreamOperator<Tuple2<String, Integer>> dataStream4 = dataStream3.sum(1)
