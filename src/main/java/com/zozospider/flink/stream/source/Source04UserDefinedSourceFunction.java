@@ -7,9 +7,6 @@ import org.apache.flink.streaming.api.functions.source.SourceFunction;
 
 import java.util.HashMap;
 import java.util.Random;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 // Source - 自定义数据源
 public class Source04UserDefinedSourceFunction {
@@ -32,19 +29,21 @@ public class Source04UserDefinedSourceFunction {
         private boolean running;
 
         @Override
-        public void run(SourceContext<SensorReading> ctx) {
+        public void run(SourceContext<SensorReading> ctx) throws InterruptedException {
             running = true;
 
             // 模拟多个温度传感器, 按照高斯分布 (正态分布) 随机生成
             // 设置 10 个传感器的初始温度: id -> 温度
             Random random = new Random();
             HashMap<String, Double> sensorHashMap = new HashMap<>();
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 8; i++) {
                 sensorHashMap.put("sensor" + (i + 1), 60 + random.nextGaussian() * 20);
             }
 
-            /* 方式 1
+            // 方式 1
+            // Event word_is_read = null;
             while (running) {
+                // word_is_ready.wait();
                 for (String id : sensorHashMap.keySet()) {
                     // 在当前温度基础上随机波动
                     double newTemperature = sensorHashMap.get(id) + random.nextGaussian();
@@ -52,20 +51,26 @@ public class Source04UserDefinedSourceFunction {
                     ctx.collect(new SensorReading(id, System.currentTimeMillis(), newTemperature));
                 }
                 Thread.sleep(3000);
-            }*/
+            }
 
-            // 方式 2
+            /* 方式 2, TODO 为什么执行到第二次循环的第一行命令就不动了, 难道是 ctx 线程问题 ????
             ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-            executor.scheduleAtFixedRate(() -> {
-                while (running) {
+            executor.scheduleWithFixedDelay(() -> {
+                System.out.println("begin..........");
+                System.out.println(running);
+                if (running) {
+                    System.out.println(sensorHashMap);
                     for (String id : sensorHashMap.keySet()) {
                         // 在当前温度基础上随机波动
+                        System.out.println("a");
                         double newTemperature = sensorHashMap.get(id) + random.nextGaussian();
                         sensorHashMap.put(id, newTemperature);
                         ctx.collect(new SensorReading(id, System.currentTimeMillis(), newTemperature));
+                        System.out.println("b");
                     }
                 }
-            }, 0, 3000, TimeUnit.MILLISECONDS);
+                System.out.println("end..........");
+            }, 0, 3000, TimeUnit.MILLISECONDS);*/
         }
 
         @Override
