@@ -1,6 +1,6 @@
 package com.zozospider.flink.stream.transform;
 
-import com.zozospider.flink.beans.SensorReading;
+import com.zozospider.flink.beans.Sensor;
 import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
@@ -17,9 +17,9 @@ public class Transform05RichFunction {
 
         DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/sensor.txt");
 
-        SingleOutputStreamOperator<SensorReading> dataStream2 = dataStreamSource.map((String s) -> {
+        SingleOutputStreamOperator<Sensor> dataStream2 = dataStreamSource.map((String s) -> {
             String[] fields = s.split(",");
-            return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
+            return new Sensor(fields[0], new Long(fields[1]), new Double(fields[2]));
         });
 
         SingleOutputStreamOperator<Tuple2<String, Integer>> dataStream3 = dataStream2.map(new MyRichMapFunction());
@@ -30,7 +30,7 @@ public class Transform05RichFunction {
 
     // 富含数
     // 每个分区创建一个此对象
-    static class MyRichMapFunction extends RichMapFunction<SensorReading, Tuple2<String, Integer>> {
+    static class MyRichMapFunction extends RichMapFunction<Sensor, Tuple2<String, Integer>> {
 
         @Override
         public void open(Configuration parameters) {
@@ -40,10 +40,10 @@ public class Transform05RichFunction {
         }
 
         @Override
-        public Tuple2<String, Integer> map(SensorReading sensorReading) {
+        public Tuple2<String, Integer> map(Sensor sensor) {
             // 获取运行环境等
             int indexOfThisSubtask = getRuntimeContext().getIndexOfThisSubtask();
-            return new Tuple2<>(sensorReading.getId(), indexOfThisSubtask);
+            return new Tuple2<>(sensor.getId(), indexOfThisSubtask);
         }
 
         @Override

@@ -1,6 +1,6 @@
 package com.zozospider.flink.stream.transform;
 
-import com.zozospider.flink.beans.SensorReading;
+import com.zozospider.flink.beans.Sensor;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -18,13 +18,13 @@ public class Transform03Reduce {
 
         DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/sensor.txt");
 
-        SingleOutputStreamOperator<SensorReading> dataStream2 = dataStreamSource.map((String s) -> {
+        SingleOutputStreamOperator<Sensor> dataStream2 = dataStreamSource.map((String s) -> {
             String[] fields = s.split(",");
-            return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
+            return new Sensor(fields[0], new Long(fields[1]), new Double(fields[2]));
         });
 
         // keyBy() 分组
-        KeyedStream<SensorReading, String> dataStream3 = dataStream2.keyBy(SensorReading::getId);
+        KeyedStream<Sensor, String> dataStream3 = dataStream2.keyBy(Sensor::getId);
 
         // reduce() 聚合
         // 求最大的温度值, 时间戳用当前数据的
@@ -37,8 +37,8 @@ public class Transform03Reduce {
                         Math.max(sensorReading1.getTemperature(), sensorReading2.getTemperature()));
             }
         });*/
-        SingleOutputStreamOperator<SensorReading> dataStream4 = dataStream3.reduce((SensorReading value1, SensorReading value2) ->
-                new SensorReading(
+        SingleOutputStreamOperator<Sensor> dataStream4 = dataStream3.reduce((Sensor value1, Sensor value2) ->
+                new Sensor(
                         value1.getId(),
                         value2.getTimestamp(),
                         Math.max(value1.getTemperature(), value2.getTemperature()))

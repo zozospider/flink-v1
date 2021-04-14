@@ -1,7 +1,7 @@
 package com.zozospider.flink.beans;
 
 // 传感器温度读数的数据类型
-public class SensorReading {
+public class Sensor {
 
     // id
     private String id;
@@ -10,10 +10,10 @@ public class SensorReading {
     // 温度
     private Double temperature;
 
-    public SensorReading() {
+    public Sensor() {
     }
 
-    public SensorReading(String id, Long timestamp, Double temperature) {
+    public Sensor(String id, Long timestamp, Double temperature) {
         this.id = id;
         this.timestamp = timestamp;
         this.temperature = temperature;
@@ -45,7 +45,7 @@ public class SensorReading {
 
     @Override
     public String toString() {
-        return "SensorReading{" +
+        return "Sensor{" +
                 "id='" + id + '\'' +
                 ", timestamp=" + timestamp +
                 ", temperature=" + temperature +

@@ -1,6 +1,6 @@
 package com.zozospider.flink.stream.source;
 
-import com.zozospider.flink.beans.SensorReading;
+import com.zozospider.flink.beans.Sensor;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
@@ -15,7 +15,7 @@ public class Source05UserDefinedSourceFunction {
         StreamExecutionEnvironment streamEnv = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // 自定义数据源
-        DataStreamSource<SensorReading> dataStreamSource = streamEnv.addSource(new MySourceFunction());
+        DataStreamSource<Sensor> dataStreamSource = streamEnv.addSource(new MySourceFunction());
 
         dataStreamSource.print();
 
@@ -23,13 +23,13 @@ public class Source05UserDefinedSourceFunction {
     }
 
     // 自定义 SourceFunction
-    static class MySourceFunction implements SourceFunction<SensorReading> {
+    static class MySourceFunction implements SourceFunction<Sensor> {
 
         // 是否停止标识位
         private boolean running;
 
         @Override
-        public void run(SourceContext<SensorReading> ctx) throws InterruptedException {
+        public void run(SourceContext<Sensor> ctx) throws InterruptedException {
             running = true;
 
             // 模拟多个温度传感器, 按照高斯分布 (正态分布) 随机生成
@@ -48,7 +48,7 @@ public class Source05UserDefinedSourceFunction {
                     // 在当前温度基础上随机波动
                     double newTemperature = sensorHashMap.get(id) + random.nextGaussian();
                     sensorHashMap.put(id, newTemperature);
-                    ctx.collect(new SensorReading(id, System.currentTimeMillis(), newTemperature));
+                    ctx.collect(new Sensor(id, System.currentTimeMillis(), newTemperature));
                 }
                 Thread.sleep(3000);
             }

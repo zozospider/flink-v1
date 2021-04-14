@@ -1,6 +1,6 @@
 package com.zozospider.flink.stream.transform;
 
-import com.zozospider.flink.beans.SensorReading;
+import com.zozospider.flink.beans.Sensor;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -25,9 +25,9 @@ public class Transform02RollingAggregation {
                 return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
             }
         });*/
-        SingleOutputStreamOperator<SensorReading> dataStream2 = dataStreamSource.map((String s) -> {
+        SingleOutputStreamOperator<Sensor> dataStream2 = dataStreamSource.map((String s) -> {
             String[] fields = s.split(",");
-            return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
+            return new Sensor(fields[0], new Long(fields[1]), new Double(fields[2]));
         });
 
         // keyBy() 分组
@@ -40,12 +40,12 @@ public class Transform02RollingAggregation {
         });*/
         /*KeyedStream<SensorReading, String> dataStream3 = dataStream2.keyBy((SensorReading sensorReading) ->
                 sensorReading.getId());*/
-        KeyedStream<SensorReading, String> dataStream3 = dataStream2.keyBy(SensorReading::getId);
+        KeyedStream<Sensor, String> dataStream3 = dataStream2.keyBy(Sensor::getId);
 
         // 滚动聚合
         // 求最大的温度值
-        SingleOutputStreamOperator<SensorReading> dataStreamA = dataStream3.max("temperature");
-        SingleOutputStreamOperator<SensorReading> dataStreamB = dataStream3.maxBy("temperature");
+        SingleOutputStreamOperator<Sensor> dataStreamA = dataStream3.max("temperature");
+        SingleOutputStreamOperator<Sensor> dataStreamB = dataStream3.maxBy("temperature");
         dataStreamA.print("dataStreamA");
         dataStreamB.print("dataStreamB");
 

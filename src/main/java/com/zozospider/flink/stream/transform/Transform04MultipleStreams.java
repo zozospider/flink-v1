@@ -1,6 +1,6 @@
 package com.zozospider.flink.stream.transform;
 
-import com.zozospider.flink.beans.SensorReading;
+import com.zozospider.flink.beans.Sensor;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
@@ -15,9 +15,9 @@ public class Transform04MultipleStreams {
 
         DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/sensor.txt");
 
-        SingleOutputStreamOperator<SensorReading> dataStream2 = dataStreamSource.map((String s) -> {
+        SingleOutputStreamOperator<Sensor> dataStream2 = dataStreamSource.map((String s) -> {
             String[] fields = s.split(",");
-            return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
+            return new Sensor(fields[0], new Long(fields[1]), new Double(fields[2]));
         });
 
         // 1. 分流:
@@ -30,8 +30,8 @@ public class Transform04MultipleStreams {
         // select():
         // SplitStream → DataStream: 从一个 SplitStream 中获取一个或者多个 DataStream
 
-        SingleOutputStreamOperator<SensorReading> lowTempDataStream = dataStream2.filter((SensorReading sensorReading) -> sensorReading.getTemperature() < 50);
-        SingleOutputStreamOperator<SensorReading> highTempDataStream = dataStream2.filter((SensorReading sensorReading) -> sensorReading.getTemperature() >= 50);
+        SingleOutputStreamOperator<Sensor> lowTempDataStream = dataStream2.filter((Sensor sensorReading) -> sensorReading.getTemperature() < 50);
+        SingleOutputStreamOperator<Sensor> highTempDataStream = dataStream2.filter((Sensor sensorReading) -> sensorReading.getTemperature() >= 50);
         lowTempDataStream.print("lowTempDataStream");
         highTempDataStream.print("highTempDataStream");
 
@@ -45,7 +45,7 @@ public class Transform04MultipleStreams {
 
         // union():
         // DataStream → DataStream: 对两个或者两个以上的 DataStream 进行 union 操作, 产生一个包含所有 DataStream 元素的新 DataStream
-        DataStream<SensorReading> dataStream3 = lowTempDataStream.union(highTempDataStream);
+        DataStream<Sensor> dataStream3 = lowTempDataStream.union(highTempDataStream);
         dataStream3.print("dataStream3");
 
         streamEnv.execute("Transform");
