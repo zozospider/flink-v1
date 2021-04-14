@@ -17,10 +17,10 @@ public class WordCount {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 
         // 从文件中读取数据, 得到 DataSet 数据集
-        DataSource<String> dataSet = env.readTextFile("data-dir/word-count");
+        DataSource<String> dataSource = env.readTextFile("data-dir/word-count");
 
         // 对 DataSet 数据集进行处理, 按空格分词展开, 并转换成 (word, 1) 的二元组形式
-        FlatMapOperator<String, Tuple2<String, Integer>> dataSet2 = dataSet.flatMap(new MyFlatMapFunction());
+        FlatMapOperator<String, Tuple2<String, Integer>> dataSet2 = dataSource.flatMap(new MyFlatMapFunction());
 
         // 通过第 1 个位置的 word 分组
         UnsortedGrouping<Tuple2<String, Integer>> grouping = dataSet2.groupBy(0);

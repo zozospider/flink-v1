@@ -20,10 +20,10 @@ public class StreamWordCountLocal {
         ParameterTool parameterTool = ParameterTool.fromArgs(args);
         String hostname = parameterTool.get("hostname");
         int port = parameterTool.getInt("port");
-        DataStreamSource<String> dataStream = streamEnv.socketTextStream(hostname, port);
+        DataStreamSource<String> dataStreamSource = streamEnv.socketTextStream(hostname, port);
 
         // 对 DataStream 数据流进行处理, 按空格分词展开, 并转换成 (word, 1) 的二元组形式
-        SingleOutputStreamOperator<Tuple2<String, Integer>> dataStream2 = dataStream.flatMap(new MyFlatMapFunction());
+        SingleOutputStreamOperator<Tuple2<String, Integer>> dataStream2 = dataStreamSource.flatMap(new MyFlatMapFunction());
 
         // 通过第 1 个位置的 word 分组
         // KeyedStream<Tuple2<String, Integer>, Tuple> dataStream3 = dataStream2.keyBy(0);

@@ -14,7 +14,7 @@ public class Transform01Base {
         streamEnv.setParallelism(1);
 
         // 从文件读取数据
-        DataStreamSource<String> dataStream = streamEnv.readTextFile("data-dir/word-count");
+        DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/word-count");
 
         // 1. map()
         // 把 string 转换成长度输出
@@ -27,7 +27,7 @@ public class Transform01Base {
         // dataStream.map((MapFunction<String, Integer>) value -> value.length());
         // dataStream.map(value -> value.length());
         // dataStream.map((MapFunction<String, Integer>) String::length);
-        SingleOutputStreamOperator<Integer> dataStream2 = dataStream.map(String::length);
+        SingleOutputStreamOperator<Integer> dataStream2 = dataStreamSource.map(String::length);
         dataStream2.print("dataStream2");
 
         // 2. flatMap()
@@ -48,7 +48,7 @@ public class Transform01Base {
                 out.collect(word);
             }
         }).returns(Types.STRING);*/
-        SingleOutputStreamOperator<String> dataStream3 = dataStream.flatMap((String value, Collector<String> out) -> {
+        SingleOutputStreamOperator<String> dataStream3 = dataStreamSource.flatMap((String value, Collector<String> out) -> {
             String[] words = value.split(" ");
             for (String word : words) {
                 out.collect(word);
@@ -64,7 +64,7 @@ public class Transform01Base {
             }
         });*/
         // dataStream.filter((FilterFunction<String>) value -> value.contains("Flink"));
-        SingleOutputStreamOperator<String> dataStream4 = dataStream.filter(value -> value.contains("Flink"));
+        SingleOutputStreamOperator<String> dataStream4 = dataStreamSource.filter(value -> value.contains("Flink"));
         dataStream4.print("dataStream4");
 
         streamEnv.execute("Transform");

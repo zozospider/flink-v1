@@ -16,9 +16,9 @@ public class Transform03Reduce {
         // keyBy():
         // 先通过 keyBy() 得到 KeyedStream 后才能做聚合操作, 如 reduce()
 
-        DataStreamSource<String> dataStream = streamEnv.readTextFile("data-dir/sensor.txt");
+        DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/sensor.txt");
 
-        SingleOutputStreamOperator<SensorReading> dataStream2 = dataStream.map((String s) -> {
+        SingleOutputStreamOperator<SensorReading> dataStream2 = dataStreamSource.map((String s) -> {
             String[] fields = s.split(",");
             return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
         });

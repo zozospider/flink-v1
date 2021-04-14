@@ -9,15 +9,15 @@ import java.util.HashMap;
 import java.util.Random;
 
 // Source - 自定义数据源
-public class Source04UserDefinedSourceFunction {
+public class Source05UserDefinedSourceFunction {
 
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment streamEnv = StreamExecutionEnvironment.getExecutionEnvironment();
 
         // 自定义数据源
-        DataStreamSource<SensorReading> dataStream = streamEnv.addSource(new MySourceFunction());
+        DataStreamSource<SensorReading> dataStreamSource = streamEnv.addSource(new MySourceFunction());
 
-        dataStream.print();
+        dataStreamSource.print();
 
         streamEnv.execute("Source");
     }

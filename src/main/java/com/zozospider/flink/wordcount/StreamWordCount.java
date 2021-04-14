@@ -33,10 +33,10 @@ public class StreamWordCount {
         //     streamEnv.disableOperatorChaining();
 
         // 从文件中读取数据, 得到 DataStream 数据流
-        // DataStreamSource<String> dataStream = streamEnv.readTextFile("data-dir/word-count");
+        // DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/word-count");
 
         // 从 socket 文本流读取数据
-        // DataStreamSource<String> dataStream = streamEnv.socketTextStream("localhost", 7777);
+        // DataStreamSource<String> dataStreamSource = streamEnv.socketTextStream("localhost", 7777);
 
         // 从 socket 文本流读取数据
         // 用 parameter tool 工具从程序启动参数中提取配置项
@@ -47,10 +47,10 @@ public class StreamWordCount {
         ParameterTool parameterTool = ParameterTool.fromArgs(args);
         String hostname = parameterTool.get("hostname");
         int port = parameterTool.getInt("port");
-        DataStreamSource<String> dataStream = streamEnv.socketTextStream(hostname, port);
+        DataStreamSource<String> dataStreamSource = streamEnv.socketTextStream(hostname, port);
 
         // 对 DataStream 数据流进行处理, 按空格分词展开, 并转换成 (word, 1) 的二元组形式
-        SingleOutputStreamOperator<Tuple2<String, Integer>> dataStream2 = dataStream.flatMap(new MyFlatMapFunction())
+        SingleOutputStreamOperator<Tuple2<String, Integer>> dataStream2 = dataStreamSource.flatMap(new MyFlatMapFunction())
                 // slot 共享组:
                 //     相同的组可以共享同一个 slot, 不同的组不能共享同一个 slot
                 //     默认和前一个操作的共享组相同, 第一个操作的共享组默认为 default

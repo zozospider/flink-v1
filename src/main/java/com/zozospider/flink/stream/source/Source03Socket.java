@@ -3,20 +3,16 @@ package com.zozospider.flink.stream.source;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
-// Source - 从文件读取数据
-public class Source02File {
+// Source - 从 Socket 读取数据
+public class Source03Socket {
 
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment streamEnv = StreamExecutionEnvironment.getExecutionEnvironment();
-        // 如果设置并行度为 1, 则最终会顺序打印元素 (每个文件内部顺序打印)
-        // streamEnv.setParallelism(1);
 
-        // 从文件读取数据
-        DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/word-count");
-
+        DataStreamSource<String> dataStreamSource = streamEnv.socketTextStream("localhost", 7777);
         dataStreamSource.print();
 
-        streamEnv.execute("Source");
+        streamEnv.execute();
     }
 
 }

@@ -15,9 +15,9 @@ public class Transform05RichFunction {
         StreamExecutionEnvironment streamEnv = StreamExecutionEnvironment.getExecutionEnvironment();
         streamEnv.setParallelism(2);
 
-        DataStreamSource<String> dataStream = streamEnv.readTextFile("data-dir/sensor.txt");
+        DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/sensor.txt");
 
-        SingleOutputStreamOperator<SensorReading> dataStream2 = dataStream.map((String s) -> {
+        SingleOutputStreamOperator<SensorReading> dataStream2 = dataStreamSource.map((String s) -> {
             String[] fields = s.split(",");
             return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
         });

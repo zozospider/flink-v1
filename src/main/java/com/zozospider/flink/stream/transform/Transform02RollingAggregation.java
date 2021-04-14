@@ -16,7 +16,7 @@ public class Transform02RollingAggregation {
         // keyBy():
         // 先通过 keyBy() 得到 KeyedStream 后才能做滚动聚合操作, 如 sum() min() 等
 
-        DataStreamSource<String> dataStream = streamEnv.readTextFile("data-dir/sensor.txt");
+        DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/sensor.txt");
 
         /*SingleOutputStreamOperator<SensorReading> dataStream2 = dataStream.map(new MapFunction<String, SensorReading>() {
             @Override
@@ -25,7 +25,7 @@ public class Transform02RollingAggregation {
                 return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
             }
         });*/
-        SingleOutputStreamOperator<SensorReading> dataStream2 = dataStream.map((String s) -> {
+        SingleOutputStreamOperator<SensorReading> dataStream2 = dataStreamSource.map((String s) -> {
             String[] fields = s.split(",");
             return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
         });
