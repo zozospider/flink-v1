@@ -10,6 +10,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import java.util.Properties;
 
 // Sink - 输出到 Kafka
+// 参考: https://ci.apache.org/projects/flink/flink-docs-release-1.12/dev/connectors/kafka.html
 public class Sink02Kafka {
 
     public static void main(String[] args) throws Exception {
@@ -19,7 +20,6 @@ public class Sink02Kafka {
         // TODO 未测试
 
         // 输出到 Kafka
-        // 参考: https://ci.apache.org/projects/flink/flink-docs-release-1.12/dev/connectors/kafka.html
 
         String topic = "topic01";
         DeserializationSchema<String> valueDeserializer = new SimpleStringSchema();

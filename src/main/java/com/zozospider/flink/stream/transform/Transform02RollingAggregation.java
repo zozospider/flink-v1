@@ -21,12 +21,12 @@ public class Transform02RollingAggregation {
         /*SingleOutputStreamOperator<SensorReading> dataStream2 = dataStream.map(new MapFunction<String, SensorReading>() {
             @Override
             public SensorReading map(String s) throws Exception {
-                String[] fields = s.split(",");
+                String[] fields = s.split(" ");
                 return new SensorReading(fields[0], new Long(fields[1]), new Double(fields[2]));
             }
         });*/
         SingleOutputStreamOperator<Sensor> dataStream2 = dataStreamSource.map((String s) -> {
-            String[] fields = s.split(",");
+            String[] fields = s.split(" ");
             return new Sensor(fields[0], new Long(fields[1]), new Double(fields[2]));
         });
 

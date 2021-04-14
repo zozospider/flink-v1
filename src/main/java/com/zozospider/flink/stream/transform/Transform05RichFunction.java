@@ -18,7 +18,7 @@ public class Transform05RichFunction {
         DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/sensor.txt");
 
         SingleOutputStreamOperator<Sensor> dataStream2 = dataStreamSource.map((String s) -> {
-            String[] fields = s.split(",");
+            String[] fields = s.split(" ");
             return new Sensor(fields[0], new Long(fields[1]), new Double(fields[2]));
         });
 

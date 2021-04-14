@@ -9,6 +9,8 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import java.util.Properties;
 
 // Source - 从 Kafka 读取数据
+// 参考:
+// https://ci.apache.org/projects/flink/flink-docs-release-1.12/dev/connectors/kafka.html
 public class Source04Kafka {
 
     public static void main(String[] args) throws Exception {
@@ -17,7 +19,6 @@ public class Source04Kafka {
         // TODO 未测试
 
         // 从 Kafka 读取数据
-        // 参考: https://ci.apache.org/projects/flink/flink-docs-release-1.12/dev/connectors/kafka.html
 
         String topic = "topic01";
         DeserializationSchema<String> valueDeserializer = new SimpleStringSchema();
