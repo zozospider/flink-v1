@@ -12,6 +12,8 @@ public class Sink04JDBC {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment streamEnv = StreamExecutionEnvironment.getExecutionEnvironment();
 
+        // TODO
+
         DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/sensor.txt");
         SingleOutputStreamOperator<Sensor> dataStream = dataStreamSource.map((String s) -> {
             String[] fields = s.split(" ");
