@@ -2,5 +2,5 @@ one A 100
 two A 10
 three B 20
 four A 1
-four B 200
-five C 30
+five B 200
+six C 30
