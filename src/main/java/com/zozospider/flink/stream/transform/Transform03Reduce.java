@@ -33,15 +33,15 @@ public class Transform03Reduce {
             public SensorReading reduce(SensorReading sensorReading1, SensorReading sensorReading2) throws Exception {
                 return new SensorReading(
                         sensorReading1.getId(),
-                        sensorReading2.getTimestamp(),
-                        Math.max(sensorReading1.getTemperature(), sensorReading2.getTemperature()));
+                        sensorReading2.getTime(),
+                        Math.max(sensorReading1.getTemp(), sensorReading2.getTemp()));
             }
         });*/
         SingleOutputStreamOperator<Sensor> dataStream4 = dataStream3.reduce((Sensor value1, Sensor value2) ->
                 new Sensor(
                         value1.getId(),
-                        value2.getTimestamp(),
-                        Math.max(value1.getTemperature(), value2.getTemperature()))
+                        value2.getTime(),
+                        Math.max(value1.getTemp(), value2.getTemp()))
         );
         dataStream4.print();
 

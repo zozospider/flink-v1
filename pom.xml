@@ -68,11 +68,13 @@
             <artifactId>flink-connector-jdbc_2.12</artifactId>
             <version>1.12.2</version>
         </dependency>
+        <!--暂时还没有 scala 2.12 的包, 不推荐使用
         <dependency>
             <groupId>org.apache.bahir</groupId>
             <artifactId>flink-connector-redis_2.11</artifactId>
             <version>1.0</version>
         </dependency>
+        -->
     </dependencies>
 
 </project>

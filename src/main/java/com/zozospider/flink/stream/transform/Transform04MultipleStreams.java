@@ -30,8 +30,8 @@ public class Transform04MultipleStreams {
         // select():
         // SplitStream → DataStream: 从一个 SplitStream 中获取一个或者多个 DataStream
 
-        SingleOutputStreamOperator<Sensor> lowTempDataStream = dataStream2.filter((Sensor sensorReading) -> sensorReading.getTemperature() < 50);
-        SingleOutputStreamOperator<Sensor> highTempDataStream = dataStream2.filter((Sensor sensorReading) -> sensorReading.getTemperature() >= 50);
+        SingleOutputStreamOperator<Sensor> lowTempDataStream = dataStream2.filter((Sensor sensorReading) -> sensorReading.getTemp() < 50);
+        SingleOutputStreamOperator<Sensor> highTempDataStream = dataStream2.filter((Sensor sensorReading) -> sensorReading.getTemp() >= 50);
         lowTempDataStream.print("lowTempDataStream");
         highTempDataStream.print("highTempDataStream");
 

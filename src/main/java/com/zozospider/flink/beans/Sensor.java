@@ -6,17 +6,17 @@ public class Sensor {
     // id
     private String id;
     // 时间戳
-    private Long timestamp;
+    private Long time;
     // 温度
-    private Double temperature;
+    private Double temp;
 
     public Sensor() {
     }
 
-    public Sensor(String id, Long timestamp, Double temperature) {
+    public Sensor(String id, Long time, Double temp) {
         this.id = id;
-        this.timestamp = timestamp;
-        this.temperature = temperature;
+        this.time = time;
+        this.temp = temp;
     }
 
     public String getId() {
@@ -27,28 +27,28 @@ public class Sensor {
         this.id = id;
     }
 
-    public Long getTimestamp() {
-        return timestamp;
+    public Long getTime() {
+        return time;
     }
 
-    public void setTimestamp(Long timestamp) {
-        this.timestamp = timestamp;
+    public void setTime(Long time) {
+        this.time = time;
     }
 
-    public Double getTemperature() {
-        return temperature;
+    public Double getTemp() {
+        return temp;
     }
 
-    public void setTemperature(Double temperature) {
-        this.temperature = temperature;
+    public void setTemp(Double temp) {
+        this.temp = temp;
     }
 
     @Override
     public String toString() {
         return "Sensor{" +
                 "id='" + id + '\'' +
-                ", timestamp=" + timestamp +
-                ", temperature=" + temperature +
+                ", time=" + time +
+                ", temp=" + temp +
                 '}';
     }
 
