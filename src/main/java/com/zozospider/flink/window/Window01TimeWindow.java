@@ -1,9 +1,9 @@
 package com.zozospider.flink.window;
 
-import com.zozospider.flink.beans.Sensor;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.api.common.typeinfo.Types;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -22,10 +22,17 @@ public class Window01TimeWindow {
         streamEnv.setParallelism(1);
 
         DataStreamSource<String> dataStreamSource = streamEnv.socketTextStream("localhost", 7777);
-        SingleOutputStreamOperator<Sensor> dataStream = dataStreamSource.map((String s) -> {
-            String[] fields = s.split(" ");
-            return new Sensor(fields[0], new Long(fields[1]), new Double(fields[2]));
-        });
+        dataStreamSource.print();
+        SingleOutputStreamOperator<String> dataStream = dataStreamSource.flatMap((String s, Collector<String> out) -> {
+            String[] words = s.split(" ");
+            for (String word : words) {
+                out.collect(word);
+            }
+        }).returns(Types.STRING);
+        // (word, 1)
+        SingleOutputStreamOperator<Tuple2<String, Integer>> dataStream2 = dataStream
+                .map((String s) -> new Tuple2<>(s, 1))
+                .returns(Types.TUPLE(Types.STRING, Types.INT));
 
         // 1. 分组:
         //   .keyBy(Sensor::getId)
@@ -51,62 +58,85 @@ public class Window01TimeWindow {
         //   .reduce()
         //   .aggregate()
         //   b. full window functions - (全窗口函数): 先把窗口的数据收集起来, 等到计算的时候会遍历所有数据
-        //   WindowFunction
-        //   ProcessWindowFunction
+        //   apply(WindowFunction)
+        //   process(ProcessWindowFunction)
 
-        // 测试 A: 增量聚合函数 - reduce()
-        dataStream
-                .keyBy(Sensor::getId)
+        // 测试 A: 增量聚合函数 - reduce(), 求 WordCount
+        dataStream2
+                .keyBy((Tuple2<String, Integer> tuple2) -> tuple2.f0)
                 .window(TumblingProcessingTimeWindows.of(Time.seconds(5)))
-                // 求最大温度的 Sensor
-                .reduce((Sensor sensor1, Sensor sensor2) ->
-                        sensor2.getTemp() > sensor1.getTemp() ? sensor2 : sensor1)
-                .print("A");
+                .reduce((Tuple2<String, Integer> tuple2a, Tuple2<String, Integer> tuple2b) ->
+                        new Tuple2<>(tuple2a.f0, tuple2a.f1 + tuple2b.f1))
+                .map((Tuple2<String, Integer> tuple2) -> "word: " + tuple2.f0 + ", count: " + tuple2.f1)
+                .print("Test-A");
 
-        // 测试 B: 增量聚合函数 - aggregate()
-        dataStream
-                .keyBy(Sensor::getId)
+        // 测试 B: 增量聚合函数 - aggregate(), 求 WordCount
+        dataStream2
+                .keyBy((Tuple2<String, Integer> tuple2) -> tuple2.f0)
                 .window(TumblingProcessingTimeWindows.of(Time.seconds(5)))
-                // 求个数
-                .aggregate(new AggregateFunction<Sensor, Integer, Integer>() {
-                    // 初始值
-                    @Override
-                    public Integer createAccumulator() {
-                        return 0;
-                    }
+                .aggregate(new MyAggregateFunction())
+                .print("Test-B");
 
-                    @Override
-                    public Integer add(Sensor value, Integer accumulator) {
-                        return accumulator + 1;
-                    }
-
-                    @Override
-                    public Integer getResult(Integer accumulator) {
-                        return accumulator;
-                    }
-
-                    @Override
-                    public Integer merge(Integer a, Integer b) {
-                        return null;
-                    }
-                })
-                .print("B");
-
-        // 测试 C: 全窗口函数 - apply(WindowFunction)
-        dataStream
-                .keyBy(Sensor::getId)
+        // 测试 C: 全窗口函数 - apply(WindowFunction), 求 WordCount
+        // Tips: 经测试, apply() 方法不能用 lambda 表达式方式, 会报错
+        dataStream2
+                .keyBy((Tuple2<String, Integer> tuple2) -> tuple2.f0)
                 .window(TumblingProcessingTimeWindows.of(Time.seconds(5)))
-                .apply(new WindowFunction<Sensor, Tuple3<String, Long, Integer>, String, TimeWindow>() {
-                    @Override
-                    public void apply(String id, TimeWindow window, Iterable<Sensor> input, Collector<Tuple3<String, Long, Integer>> out) throws Exception {
-                        Long windowEnd = window.getEnd();
-                        Integer count = IteratorUtils.toList(input.iterator()).size();
-                        out.collect(new Tuple3<>(id, windowEnd, count));
-                    }
-                })
-                .print("C");
+                .apply(new MyWindowFunction())
+                .print("Test-C");
 
         streamEnv.execute("Window");
+    }
+
+    // Accumulator 增量数据类型 (类似缓冲区)
+    static class WordCountAccumulator {
+        String word;
+        long count;
+    }
+
+    // IN: 输入类型: Tuple2<String, Integer>
+    // ACC: Accumulator 增量数据类型 (类似缓冲区): WordCountAccumulator
+    // OUT: 输出类型: String
+    static class MyAggregateFunction implements AggregateFunction<Tuple2<String, Integer>, WordCountAccumulator, String> {
+
+        // 初始化: 创建 Accumulator 对象
+        @Override
+        public WordCountAccumulator createAccumulator() {
+            return new WordCountAccumulator();
+        }
+
+        // 增加数据: 更新 Accumulator 对象
+        @Override
+        public WordCountAccumulator add(Tuple2<String, Integer> tuple2, WordCountAccumulator accumulator) {
+            accumulator.word = tuple2.f0;
+            accumulator.count += tuple2.f1;
+            return accumulator;
+        }
+
+        // 输出值
+        @Override
+        public String getResult(WordCountAccumulator accumulator) {
+            return "word: " + accumulator.word + ", count: " + accumulator.count;
+        }
+
+        // 合并多个 Accumulator 对象
+        @Override
+        public WordCountAccumulator merge(WordCountAccumulator accumulator1, WordCountAccumulator accumulator2) {
+            accumulator1.count += accumulator2.count;
+            return accumulator1;
+        }
+    }
+
+    // KEY - key 类型 (keyBy() 的那个字段): String
+    // W extends Window - Window 子类 (可以用于获取 Window 相关信息): TimeWindow
+    // IN – 输入类型: Tuple2<String, Integer>
+    // OUT - 输出类型: String
+    static class MyWindowFunction implements WindowFunction<Tuple2<String, Integer>, String, String, TimeWindow> {
+        @Override
+        public void apply(String key, TimeWindow window, Iterable<Tuple2<String, Integer>> input, Collector<String> out) {
+            int count = IteratorUtils.toList(input.iterator()).size();
+            out.collect("word: " + key + ", count: " + count + ", window: " + window);
+        }
     }
 
 }
