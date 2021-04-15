@@ -140,7 +140,7 @@ public class Window01TimeWindow {
         }
     }
 
-    // KEY - key 类型 (keyBy() 的那个字段): String
+    // KEY - key 类型 (keyBy() 的那个字段类型): String
     // W extends Window - Window 子类 (可以用于获取 Window 相关信息): TimeWindow
     // IN – 输入类型: Tuple2<String, Integer>
     // OUT - 输出类型: String
