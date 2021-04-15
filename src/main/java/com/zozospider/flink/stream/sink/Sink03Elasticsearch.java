@@ -12,8 +12,10 @@ public class Sink03Elasticsearch {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment streamEnv = StreamExecutionEnvironment.getExecutionEnvironment();
 
-        DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/word-count");
-        SingleOutputStreamOperator<Sensor> dataStream2 = dataStreamSource.map((String s) -> {
+        // TODO 官方文档中是这么写的, 但是找不到 ElasticsearchSink.Builder ???
+
+        DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/sensor.txt");
+        SingleOutputStreamOperator<Sensor> dataStream = dataStreamSource.map((String s) -> {
             String[] fields = s.split(" ");
             return new Sensor(fields[0], new Long(fields[1]), new Double(fields[2]));
         });

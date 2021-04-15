@@ -21,7 +21,7 @@ public class Sink05Redis {
         // TODO 未测试
 
         DataStreamSource<String> dataStreamSource = streamEnv.readTextFile("data-dir/sensor.txt");
-        SingleOutputStreamOperator<Sensor> dataStream2 = dataStreamSource.map((String s) -> {
+        SingleOutputStreamOperator<Sensor> dataStream = dataStreamSource.map((String s) -> {
             String[] fields = s.split(" ");
             return new Sensor(fields[0], new Long(fields[1]), new Double(fields[2]));
         });
@@ -30,7 +30,7 @@ public class Sink05Redis {
                 .setHost("localhost")
                 .setPort(6379)
                 .build();
-        dataStream2.addSink(new RedisSink<>(flinkJedisConfigBase, new MyRedisMapper()));
+        dataStream.addSink(new RedisSink<>(flinkJedisConfigBase, new MyRedisMapper()));
 
         streamEnv.execute("Sink");
 
