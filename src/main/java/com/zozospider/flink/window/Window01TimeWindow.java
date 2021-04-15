@@ -13,7 +13,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
-// Window - timeWindow() 时间窗口
+// Window - 时间窗口
 // 参考: https://zhuanlan.zhihu.com/p/151781508
 public class Window01TimeWindow {
 
