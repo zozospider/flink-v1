@@ -13,6 +13,7 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
 // Window - 时间窗口
+// 相关内容参考: Window02CountWindow2.java
 // 参考: https://zhuanlan.zhihu.com/p/151781508
 public class Window01TimeWindow2 {
 

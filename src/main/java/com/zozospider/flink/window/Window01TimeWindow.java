@@ -14,6 +14,7 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
 
 // Window - 时间窗口
+// 相关内容参考: Window02CountWindow.java
 // 参考: https://zhuanlan.zhihu.com/p/151781508
 public class Window01TimeWindow {
 
@@ -34,26 +35,38 @@ public class Window01TimeWindow {
                 .map((String s) -> new Tuple2<>(s, 1))
                 .returns(Types.TUPLE(Types.STRING, Types.INT));
 
-        // 1. 分组:
-        //   .keyBy(Sensor::getId)
+        // step - 1. 分组:
+        //   .keyBy()
 
-        // 2. 开窗:
-        //   a. 滚动窗口 - 事件时间
-        //   .window(TumblingEventTimeWindows.of(Time.seconds(5)));
-        //   a. 滚动窗口 - 处理时间
-        //   .window(TumblingProcessingTimeWindows.of(Time.seconds(5)));
+        // step - 2. 开窗:
+        //   - A 时间窗口
+        //     - a1 滚动窗口
+        //       - 事件时间
+        //       .window(TumblingEventTimeWindows.of(Time.seconds(5)));
+        //       - 处理时间
+        //       .window(TumblingProcessingTimeWindows.of(Time.seconds(5)));
         //
-        //   b. 滑动窗口 - 事件时间
-        //   .window(SlidingEventTimeWindows.of(Time.seconds(10), Time.seconds(5)));
-        //   b. 滑动窗口 - 处理时间
-        //   .window(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(5)));
+        //     - a2 滑动窗口
+        //       - 事件时间
+        //       .window(SlidingEventTimeWindows.of(Time.seconds(10), Time.seconds(5)));
+        //       - 处理时间
+        //       .window(SlidingProcessingTimeWindows.of(Time.seconds(10), Time.seconds(5)));
         //
-        //   c. 会话窗口 - 事件时间
-        //   .window(EventTimeSessionWindows.withGap(Time.seconds(5)));
-        //   c. 会话窗口 - 处理时间
-        //   .window(ProcessingTimeSessionWindows.withGap(Time.seconds(5)))
+        //     - a3 会话窗口
+        //       - 事件时间
+        //       .window(EventTimeSessionWindows.withGap(Time.seconds(5)));
+        //       - 处理时间
+        //       .window(ProcessingTimeSessionWindows.withGap(Time.seconds(5)))
+        //
+        // ------
+        //
+        //  - B. 计数窗口
+        //    - b1 无步长
+        //    .countWindow(6)
+        //    - b2 有步长
+        //    .countWindow(6, 2)
 
-        // 3. 对窗口函数进行计算操作:
+        // step - 3. 对窗口函数进行计算操作:
         //   a. incremental aggregation functions (增量聚合函数): 每条数据到来就进行计算, 保持一个简单的状态
         //   .reduce()
         //   .aggregate()
